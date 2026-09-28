@@ -59,7 +59,7 @@
       "y": 123,
       "w": 228,
       "h": 153,
-      "title": "Notepersonalities(NEGATIVE)",
+      "title": "personalities(NEGATIVE)",
       "text": "OVERTHNGKING\nSELF-DOUBT\nMENTAL NOISE\nFUTURE ANXIETY\nPERFECTIONISM\nMIND WANDERING\nOVER-ANALIYSIS",
       "color": "#b0403f",
       "collapsed": false,
@@ -207,6 +207,19 @@
       "color": "#b8772a",
       "collapsed": false,
       "done": false
+    },
+    {
+      "id": "l2i2s3j",
+      "type": "note",
+      "x": 246,
+      "y": 778,
+      "w": 287,
+      "h": 294,
+      "title": "School needed",
+      "text": "",
+      "color": "#2f6c94",
+      "collapsed": false,
+      "done": false
     }
   ],
   "links": [
@@ -294,11 +307,16 @@
       "id": "br7i7ym",
       "from": "c8rj8hu",
       "to": "4u9r3vz"
+    },
+    {
+      "id": "7krpg6a",
+      "from": "wq2ryvt",
+      "to": "l2i2s3j"
     }
   ],
   "view": {
-    "x": 579.4252968227062,
-    "y": 338.52529216603057,
-    "z": 0.19520057870637705
+    "x": 897.9979477399588,
+    "y": 213.37769693492146,
+    "z": 0.869015459439558
   }
 }
