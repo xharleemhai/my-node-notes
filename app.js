@@ -641,7 +641,6 @@ async function init(){
 
   refreshPanel();
 }
-}
 addEventListener('resize',()=>requestView());
 init();
 })();
