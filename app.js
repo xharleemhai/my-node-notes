@@ -590,14 +590,57 @@ function sample(){
   const L=(x,y)=>({id:uid(),from:x.id,to:y.id});
   return{nodes:[fr,a,b,c,d,e,f,g],links:[L(a,b),L(a,c),L(c,d),L(b,e),L(d,f)],view:{x:0,y:0,z:1}};
 }
-function init(){
-  let loaded=null;
-  try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(Array.isArray(o.nodes)&&Array.isArray(o.links))loaded=o}}catch(e){}
-  setSide(innerWidth>=640);
-  S=loaded||sample(); if(!S.view)S.view={x:0,y:0,z:1};
-  renderAll(); hist=[snap()]; hi=0;
-  if(loaded)applyView();else frameAll(false);
+async function init(){
+  let loaded = null;
+
+  try {
+    const response = await fetch('./node-notes.json', { cache: 'no-store' });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (Array.isArray(data.nodes) && Array.isArray(data.links)) {
+        loaded = data;
+      }
+    }
+  } catch (error) {
+    console.log('Could not load node-notes.json:', error);
+  }
+
+  if (!loaded) {
+    try {
+      const raw = localStorage.getItem(KEY);
+
+      if (raw) {
+        const data = JSON.parse(raw);
+
+        if (Array.isArray(data.nodes) && Array.isArray(data.links)) {
+          loaded = data;
+        }
+      }
+    } catch (error) {
+      console.log('Could not load localStorage:', error);
+    }
+  }
+
+  setSide(innerWidth >= 640);
+
+  s = loaded || sample();
+
+  if (!s.view) {
+    s.view = { x: 0, y: 0, z: 1 };
+  }
+
+  renderAll();
+
+  if (loaded) {
+    applyView();
+  } else {
+    frameAll(false);
+  }
+
   refreshPanel();
+}
 }
 addEventListener('resize',()=>requestView());
 init();
