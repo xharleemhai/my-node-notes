@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1d1d1d">
+<title>Node Notes</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="world"><svg id="wires" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div id="boxsel"></div>
+</div>
+
+<button id="toggle" aria-label="Show or hide tools">
+  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<aside id="side">
+  <div class="panel" id="pAdd">
+    <div class="ph"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 3l3 4 3-4z" fill="currentColor"/></svg>Add</div>
+    <div class="pb">
+      <div class="grid2" id="addGrid"></div>
+      <label class="opt"><input type="checkbox" id="optConnect" checked><span>Connect to selected</span></label>
+    </div>
+  </div>
+
+  <div class="panel" id="pNode">
+    <div class="ph"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 3l3 4 3-4z" fill="currentColor"/></svg>Node</div>
+    <div class="pb off" id="nodeBody">
+      <input class="field" id="nameInput" placeholder="Pangalan ng node" autocomplete="off">
+      <div class="sw" id="swatches"></div>
+      <div class="row two">
+        <button class="btn" id="btnCollapse">Collapse</button>
+        <button class="btn" id="btnDup">Duplicate</button>
+      </div>
+      <button class="btn danger" id="btnDel">Delete</button>
+    </div>
+    <div class="pb" id="nodeHint" style="padding-top:0"><div class="hint">Pumili ng node para ma-edit ang pangalan at kulay.</div></div>
+  </div>
+
+  <div class="panel" id="pView">
+    <div class="ph"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 3l3 4 3-4z" fill="currentColor"/></svg>View</div>
+    <div class="pb">
+      <div class="seg">
+        <button class="btn on" id="toolPan">Pan</button>
+        <button class="btn" id="toolBox">Box select</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="zOut" style="width:34px;padding:0">−</button>
+        <input type="range" id="zoom" min="15" max="300" value="100">
+        <button class="btn" id="zIn" style="width:34px;padding:0">+</button>
+      </div>
+      <div class="row"><span class="lbl" style="flex:1">Zoom</span><span class="pct" id="pct">100%</span></div>
+      <div class="row two">
+        <button class="btn" id="btnFrame">Frame all</button>
+        <button class="btn" id="btnReset">1:1</button>
+      </div>
+      <label class="opt"><input type="checkbox" id="optSnap"><span>Snap to grid</span></label>
+    </div>
+  </div>
+
+  <div class="panel" id="pEdit">
+    <div class="ph"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 3l3 4 3-4z" fill="currentColor"/></svg>Edit</div>
+    <div class="pb">
+      <div class="row two">
+        <button class="btn" id="btnUndo">Undo</button>
+        <button class="btn" id="btnRedo">Redo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="pFile">
+    <div class="ph"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 3l3 4 3-4z" fill="currentColor"/></svg>File</div>
+    <div class="pb">
+      <div class="row two">
+        <button class="btn" id="btnExport">Export</button>
+        <button class="btn" id="btnImport">Import</button>
+      </div>
+      <button class="btn danger" id="btnClear">Clear all</button>
+      <div class="hint">Auto-save sa browser na ito.</div>
+    </div>
+  </div>
+
+  <div class="panel closed" id="pKeys">
+    <div class="ph"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 3l3 4 3-4z" fill="currentColor"/></svg>Shortcuts</div>
+    <div class="pb">
+      <div class="keys">
+        <b>Double-click</b><span>Bagong note</span>
+        <b>Scroll / pinch</b><span>Zoom</span>
+        <b>Shift + drag</b><span>Box select</span>
+        <b>Shift + D</b><span>Duplicate</span>
+        <b>X / Delete</b><span>Burahin</span>
+        <b>Ctrl + Z</b><span>Undo</span>
+        <b>Home</b><span>Frame all</span>
+        <b>N</b><span>Toggle panel</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot" id="stats"></div>
+</aside>
+
+<div id="toast"></div>
+<input type="file" id="file" accept="application/json,.json" hidden>
+
+<script src="app.js"></script>
+</body>
+</html>
