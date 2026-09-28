@@ -577,68 +577,13 @@ window.addEventListener('keydown',e=>{
 });
 
 /* ---------------- sample + init ---------------- */
-function sample(){
-  const mk=(type,x,y,w,h,title,text,extra={})=>({id:uid(),type,x,y,w,h,title,text,color:TYPES[type].color,collapsed:false,done:false,...extra});
-  const fr=mk('frame',-50,-110,1370,500,'Plano: Habit Tracker App','');
-  const a=mk('idea',0,10,250,90,'Main idea','Habit tracker para sa mga estudyante. Simple lang, hindi nakaka-overwhelm.');
-  const b=mk('note',340,-50,250,100,'Mga feature','- Daily streak\n- Simpleng reminder\n- Weekly report');
-  const c=mk('question',340,170,250,80,'Tanong','Kailangan ba ng login sa unang version?');
-  const d=mk('decision',680,170,250,80,'Desisyon','Walang login muna. Local lang para mabilis ma-launch.');
-  const e=mk('task',680,-50,250,70,'Gumawa ng wireframe','3 screens: Home, Add habit, Stats');
-  const f=mk('task',1020,170,250,60,'Ipa-test sa 5 kaibigan','');
-  const g=mk('note',0,200,300,150,'Paano gamitin','Double-click sa blangko = bagong note\nI-drag ang bilog sa gilid ng node para mag-wire\nI-drag ang blangko para mag-pan, scroll/pinch para mag-zoom\nPumili ng node tapos pindutin ang Idea o Task sa kanan para may kasunod agad na naka-wire',{color:'#5a5a5a'});
-  const L=(x,y)=>({id:uid(),from:x.id,to:y.id});
-  return{nodes:[fr,a,b,c,d,e,f,g],links:[L(a,b),L(a,c),L(c,d),L(b,e),L(d,f)],view:{x:0,y:0,z:1}};
-}
-async function init(){
-  let loaded = null;
-
-  try {
-    const response = await fetch('./node-notes.json', { cache: 'no-store' });
-
-    if (response.ok) {
-      const data = await response.json();
-
-      if (Array.isArray(data.nodes) && Array.isArray(data.links)) {
-        loaded = data;
-      }
-    }
-  } catch (error) {
-    console.log('Could not load node-notes.json:', error);
-  }
-
-  if (!loaded) {
-    try {
-      const raw = localStorage.getItem(KEY);
-
-      if (raw) {
-        const data = JSON.parse(raw);
-
-        if (Array.isArray(data.nodes) && Array.isArray(data.links)) {
-          loaded = data;
-        }
-      }
-    } catch (error) {
-      console.log('Could not load localStorage:', error);
-    }
-  }
-
-  setSide(innerWidth >= 640);
-
-  s = loaded || sample();
-
-  if (!s.view) {
-    s.view = { x: 0, y: 0, z: 1 };
-  }
-
-  renderAll();
-
-  if (loaded) {
-    applyView();
-  } else {
-    frameAll(false);
-  }
-
+function init(){
+  let loaded=null;
+  try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(Array.isArray(o.nodes)&&Array.isArray(o.links))loaded=o}}catch(e){}
+  setSide(innerWidth>=640);
+  S=loaded||sample(); if(!S.view)S.view={x:0,y:0,z:1};
+  renderAll(); hist=[snap()]; hi=0;
+  if(loaded)applyView();else frameAll(false);
   refreshPanel();
 }
 addEventListener('resize',()=>requestView());
