@@ -681,8 +681,13 @@ async function setupLogin(){
   const loginScreen=document.getElementById('loginScreen');
   const loginEmail=document.getElementById('loginEmail');
   const loginPassword=document.getElementById('loginPassword');
+  const confirmPassword=document.getElementById('confirmPassword');
   const loginBtn=document.getElementById('loginBtn');
+  const signupBtn=document.getElementById('signupBtn');
   const loginError=document.getElementById('loginError');
+  const authTitle=document.getElementById('authTitle');
+
+  let signupMode=false;
 
   const {data:{session}}=await db.auth.getSession();
 
@@ -691,7 +696,67 @@ async function setupLogin(){
     await init();
   }
 
+  signupBtn.addEventListener('click',async()=>{
+    loginError.textContent='';
+
+    if(!signupMode){
+      signupMode=true;
+      authTitle.textContent='Create Account';
+      confirmPassword.style.display='block';
+      loginBtn.textContent='Create Account';
+      signupBtn.textContent='Back to Login';
+      return;
+    }
+
+    const email=loginEmail.value.trim();
+    const password=loginPassword.value;
+    const confirm=confirmPassword.value;
+
+    if(!email||!password){
+      loginError.textContent='Please enter your email and password.';
+      return;
+    }
+
+    if(password!==confirm){
+      loginError.textContent='Passwords do not match.';
+      return;
+    }
+
+    signupBtn.disabled=true;
+    loginBtn.disabled=true;
+    loginBtn.textContent='Creating account...';
+
+    const {data,error}=await db.auth.signUp({
+      email,
+      password
+    });
+
+    if(error){
+      loginError.textContent=error.message;
+      signupBtn.disabled=false;
+      loginBtn.disabled=false;
+      loginBtn.textContent='Create Account';
+      return;
+    }
+
+    if(data.session){
+      loginScreen.style.display='none';
+      await init();
+      return;
+    }
+
+    loginError.style.color='#7ee787';
+    loginError.textContent='Account created! Check your email to confirm your account.';
+
+    signupBtn.disabled=false;
+    loginBtn.disabled=false;
+    loginBtn.textContent='Create Account';
+  });
+
   loginBtn.addEventListener('click',async()=>{
+    if(signupMode)return;
+
+    loginError.style.color='#ff6b6b';
     loginError.textContent='';
     loginBtn.disabled=true;
     loginBtn.textContent='Logging in...';
