@@ -102,9 +102,53 @@
   <div class="foot" id="stats"></div>
 </aside>
 
+<div id="loginScreen" style="
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+">
+  <div style="
+    width:320px;
+    padding:28px;
+    border-radius:16px;
+    background:#1c1c1c;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+  ">
+    <h2 style="margin-top:0">Node Notes</h2>
+
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="Email"
+      style="width:100%;box-sizing:border-box;margin-bottom:10px;padding:12px"
+    >
+
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Password"
+      style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:12px"
+    >
+
+    <button
+      id="loginBtn"
+      style="width:100%;padding:12px;cursor:pointer"
+    >
+      Login
+    </button>
+
+    <div id="loginError" style="margin-top:12px;color:#ff6b6b"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 <input type="file" id="file" accept="application/json,.json" hidden>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 </body>
 </html>
