@@ -118,7 +118,7 @@
     background:#1c1c1c;
     box-shadow:0 10px 40px rgba(0,0,0,.5);
   ">
-    <h2 style="margin-top:0">Node Notes</h2>
+    <h2 id="authTitle" style="margin-top:0">Node Notes</h2>
 
     <input
       id="loginEmail"
@@ -131,7 +131,14 @@
       id="loginPassword"
       type="password"
       placeholder="Password"
-      style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:12px"
+      style="width:100%;box-sizing:border-box;margin-bottom:10px;padding:12px"
+    >
+
+    <input
+      id="confirmPassword"
+      type="password"
+      placeholder="Confirm Password"
+      style="display:none;width:100%;box-sizing:border-box;margin-bottom:12px;padding:12px"
     >
 
     <button
@@ -139,6 +146,21 @@
       style="width:100%;padding:12px;cursor:pointer"
     >
       Login
+    </button>
+
+    <button
+      id="signupBtn"
+      style="
+        width:100%;
+        padding:10px;
+        margin-top:10px;
+        cursor:pointer;
+        background:none;
+        color:#aaa;
+        border:0;
+      "
+    >
+      Create Account
     </button>
 
     <div id="loginError" style="margin-top:12px;color:#ff6b6b"></div>
