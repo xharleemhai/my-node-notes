@@ -6,6 +6,13 @@ const stage=$('#stage'),bg=$('#bg'),world=$('#world'),wires=$('#wires'),boxEl=$(
 const uid=()=>Math.random().toString(36).slice(2,9);
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`};
+const SUPABASE_URL = 'https://gfsaneenutevnjidgjio.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_HStLYFdTUVyUOAb8Hi-eBg__gXq_6xG';
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
 const TYPES={
   note:{label:'Note',color:'#2f6c94',w:240,h:96},
@@ -27,8 +34,35 @@ const visW=()=>innerWidth-(side.classList.contains('closed')?0:side.offsetWidth)
 /* ---------------- history + save ---------------- */
 let hist=[],hi=-1,saveT=0;
 const snap=()=>JSON.stringify({nodes:S.nodes,links:S.links});
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,400)}
+async function saveCloud(){
+  try{
+    const {data:{user}}=await db.auth.getUser();
+    if(!user)return;
+
+    const {error}=await db.from('node_documents').upsert({
+      user_id:user.id,
+      data:S,
+      updated_at:new Date().toISOString()
+    });
+
+    if(error)console.error('Cloud save error:',error);
+  }catch(e){
+    console.error('Cloud save error:',e);
+  }
+}
+
+function save(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(S));
+  }catch(e){}
+
+  saveCloud();
+}
+
+function saveSoon(){
+  clearTimeout(saveT);
+  saveT=setTimeout(save,400);
+}
 function commit(){
   const s=snap(); if(hist[hi]===s){save();return}
   hist=hist.slice(0,hi+1); hist.push(s); if(hist.length>120)hist.shift();
@@ -577,15 +611,110 @@ window.addEventListener('keydown',e=>{
 });
 
 /* ---------------- sample + init ---------------- */
-function init(){
-  let loaded=null;
-  try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(Array.isArray(o.nodes)&&Array.isArray(o.links))loaded=o}}catch(e){}
-  setSide(innerWidth>=640);
-  S=loaded||sample(); if(!S.view)S.view={x:0,y:0,z:1};
-  renderAll(); hist=[snap()]; hi=0;
-  if(loaded)applyView();else frameAll(false);
-  refreshPanel();
+async function loadCloud(){
+  try{
+    const {data:{user},error:userError}=await db.auth.getUser();
+
+    if(userError||!user){
+      console.error('Cloud user error:',userError);
+      return {ok:false,state:null};
+    }
+
+    const {data,error}=await db
+      .from('node_documents')
+      .select('data')
+      .eq('user_id',user.id)
+      .maybeSingle();
+
+    if(error){
+      console.error('Cloud load error:',error);
+      return {ok:false,state:null};
+    }
+
+    if(data?.data && Array.isArray(data.data.nodes) && Array.isArray(data.data.links)){
+      return {ok:true,state:data.data};
+    }
+
+    return {ok:true,state:null};
+  }catch(e){
+    console.error('Cloud load error:',e);
+    return {ok:false,state:null};
+  }
 }
+
+async function init(){
+  let localLoaded=null;
+
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){
+      const o=JSON.parse(raw);
+      if(Array.isArray(o.nodes)&&Array.isArray(o.links)) localLoaded=o;
+    }
+  }catch(e){}
+
+  setSide(innerWidth>=640);
+
+  const cloud=await loadCloud();
+
+  S=cloud.state||localLoaded||sample();
+
+  if(!S.view)S.view={x:0,y:0,z:1};
+
+  renderAll();
+  hist=[snap()];
+  hi=0;
+
+  if(cloud.state||localLoaded) applyView();
+  else frameAll(false);
+
+  refreshPanel();
+
+  if(cloud.ok && !cloud.state && localLoaded){
+    await saveCloud();
+  }
+}
+
 addEventListener('resize',()=>requestView());
-init();
+
+async function setupLogin(){
+  const loginScreen=document.getElementById('loginScreen');
+  const loginEmail=document.getElementById('loginEmail');
+  const loginPassword=document.getElementById('loginPassword');
+  const loginBtn=document.getElementById('loginBtn');
+  const loginError=document.getElementById('loginError');
+
+  const {data:{session}}=await db.auth.getSession();
+
+  if(session){
+    loginScreen.style.display='none';
+    await init();
+  }
+
+  loginBtn.addEventListener('click',async()=>{
+    loginError.textContent='';
+    loginBtn.disabled=true;
+    loginBtn.textContent='Logging in...';
+
+    const {error}=await db.auth.signInWithPassword({
+      email:loginEmail.value.trim(),
+      password:loginPassword.value
+    });
+
+    if(error){
+      loginError.textContent=error.message;
+      loginBtn.disabled=false;
+      loginBtn.textContent='Login';
+      return;
+    }
+
+    loginScreen.style.display='none';
+    loginBtn.disabled=false;
+    loginBtn.textContent='Login';
+
+    await init();
+  });
+}
+
+setupLogin();
 })();
