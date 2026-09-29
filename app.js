@@ -796,6 +796,6 @@ async function setupLogin(){
     }
   });
 }
-  
+
 setupLogin();
 })();
