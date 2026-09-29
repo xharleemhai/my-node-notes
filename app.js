@@ -696,90 +696,106 @@ async function setupLogin(){
     await init();
   }
 
-  signupBtn.addEventListener('click',async()=>{
+  // Create Account / Back to Login
+  signupBtn.addEventListener('click',()=>{
     loginError.textContent='';
+    loginError.style.color='#ff6b6b';
 
-    if(!signupMode){
-      signupMode=true;
+    signupMode=!signupMode;
+
+    if(signupMode){
       authTitle.textContent='Create Account';
       confirmPassword.style.display='block';
       loginBtn.textContent='Create Account';
       signupBtn.textContent='Back to Login';
-      return;
+    }else{
+      authTitle.textContent='Node Notes';
+      confirmPassword.style.display='none';
+      loginBtn.textContent='Login';
+      signupBtn.textContent='Create Account';
+      loginError.textContent='';
     }
+  });
+
+  // Login OR Create Account
+  loginBtn.addEventListener('click',async()=>{
+    loginError.textContent='';
+    loginError.style.color='#ff6b6b';
 
     const email=loginEmail.value.trim();
     const password=loginPassword.value;
-    const confirm=confirmPassword.value;
 
     if(!email||!password){
       loginError.textContent='Please enter your email and password.';
       return;
     }
 
-    if(password!==confirm){
-      loginError.textContent='Passwords do not match.';
-      return;
-    }
+    if(signupMode){
+      const confirm=confirmPassword.value;
 
-    signupBtn.disabled=true;
-    loginBtn.disabled=true;
-    loginBtn.textContent='Creating account...';
+      if(password!==confirm){
+        loginError.textContent='Passwords do not match.';
+        return;
+      }
 
-    const {data,error}=await db.auth.signUp({
-      email,
-      password
-    });
+      loginBtn.disabled=true;
+      signupBtn.disabled=true;
+      loginBtn.textContent='Creating account...';
 
-    if(error){
-      loginError.textContent=error.message;
+      const {data,error}=await db.auth.signUp({
+        email,
+        password
+      });
+
+      if(error){
+        loginError.textContent=error.message;
+        loginBtn.disabled=false;
+        signupBtn.disabled=false;
+        loginBtn.textContent='Create Account';
+        return;
+      }
+
+      if(data.session){
+        loginScreen.style.display='none';
+        await init();
+        return;
+      }
+
+      loginError.style.color='#7ee787';
+      loginError.textContent=
+        'Account created! Check your email to confirm your account.';
+
+      loginBtn.disabled=false;
       signupBtn.disabled=false;
-      loginBtn.disabled=false;
       loginBtn.textContent='Create Account';
-      return;
-    }
 
-    if(data.session){
+    }else{
+      loginBtn.disabled=true;
+      signupBtn.disabled=true;
+      loginBtn.textContent='Logging in...';
+
+      const {error}=await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if(error){
+        loginError.textContent=error.message;
+        loginBtn.disabled=false;
+        signupBtn.disabled=false;
+        loginBtn.textContent='Login';
+        return;
+      }
+
       loginScreen.style.display='none';
-      await init();
-      return;
-    }
-
-    loginError.style.color='#7ee787';
-    loginError.textContent='Account created! Check your email to confirm your account.';
-
-    signupBtn.disabled=false;
-    loginBtn.disabled=false;
-    loginBtn.textContent='Create Account';
-  });
-
-  loginBtn.addEventListener('click',async()=>{
-    if(signupMode)return;
-
-    loginError.style.color='#ff6b6b';
-    loginError.textContent='';
-    loginBtn.disabled=true;
-    loginBtn.textContent='Logging in...';
-
-    const {error}=await db.auth.signInWithPassword({
-      email:loginEmail.value.trim(),
-      password:loginPassword.value
-    });
-
-    if(error){
-      loginError.textContent=error.message;
       loginBtn.disabled=false;
+      signupBtn.disabled=false;
       loginBtn.textContent='Login';
-      return;
+
+      await init();
     }
-
-    loginScreen.style.display='none';
-    loginBtn.disabled=false;
-    loginBtn.textContent='Login';
-
-    await init();
   });
 }
-
+  
 setupLogin();
 })();
